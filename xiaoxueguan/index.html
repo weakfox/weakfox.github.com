@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小学馆第三版快速查询</title>
+  <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+  <div id="app">
+    <iframe class="result" :src="result" v-if="showResult" id="iframe1"></iframe>
+    <div class="go-home" @click="showResult=false" v-if="showResult"></div>
+    <div class="content" v-else>
+      <div class="title">小学馆第三版快速查询</div>
+      <div style="font-size: 10rpx;color: #f7f7f7;position: fixed;bottom: 0;left: 50%;transform: translateX(-50%);">Powered by Watanabe</div>
+      <div class="query">
+        <div class="switch-btn">
+          <div class="my-switch-container" @click="handleSwitchClick">
+            <div class="left-text" :style="{color:current?'#000000':'#ffffff'}">{{leftText}}</div>
+            <div class="right-text" :style="{color:current?'#ffffff':'#000000'}">{{rightText}}</div>
+            <div class="switch-block" :style="{left:current?'50%':'0'}"></div>
+          </div>
+        </div>
+        
+        <div class="input-container">
+          <input class="keyword-input" type="text" v-model="keyword" :style="{'border':inputFocus?'2px solid #97b3ee':''}"
+            @focus="inputFocus=!inputFocus" @blur="inputFocus=!inputFocus"/>
+          <button class="kensaku-btn" @click="search" :disabled="!keyword">検索</button>
+        </div>
+      </div>
+      <div class="history-title" v-if="history.length!==0">
+        <span>搜索历史</span>
+        <span class="clearBtn" @click="clearHistory">×</span>
+      </div>
+      <div class="history" v-if="history.length!==0">
+        <div class="history-item" v-for="(item,index) in history" @click="[viewhistory(item)]">{{item.keyword}}</div>
+      </div>
+      <div class="mianze" @click="mzShow=true">免责声明&nbspDisclaimer</div>
+      <div class="model" v-if="mzShow" @click="mzShow=false"></div>
+      <div class="mianze-zhengwen" v-if="mzShow">
+        <h3 style="margin-bottom: 2vh;">免责声明&nbspDisclaimer</h3>
+        <p>1、本网页直接跳转词典服务商的查询页面，查询内容与本网页无任何关系，不代表本网页的观点。</p>
+        <p>2、本网页仅提供查询跳转服务，跳出主界面后的内容与本网页无关。且本网页不会拦截第三方页面内容，保证第三方页面完整性。</p>
+      </div>
+      <div class="huli">狐狸等间隔</div>
+    </div>
+  </div>
+</body>
+
+</html>
+
+<script src="js\vue.global.js"></script>
+<script src="js\jquery-1.9.1.js"></script>
+<script type="module">
+  const myapp = {
+    data() {
+      return {
+        leftText:'中日',
+        rightText:'日中',
+        inputFocus: false,
+				keyword:'',
+				current:false,
+				showResult:false,
+				mzShow:false,
+				result:'',
+				history:[]
+      }
+    },
+    computed: {
+      
+    },
+    methods: {
+      search() {
+				// console.log(this.keyword);
+				const url = this.current?'https://kotobank.jp/jazhword/':'https://kotobank.jp/zhjaword/'
+				this.result = url + this.keyword
+        this.showResult = true
+        setTimeout(() => {
+          const iframe = document.getElementById('iframe1')
+          iframe.addEventListener('onload',(()=>{
+            console.log(1111);
+          }))
+        }, 1000);
+        
+        const historyKeywords = []
+        this.history.forEach((v,i) => {
+          historyKeywords.push(v.keyword)
+        });
+        if (historyKeywords.indexOf(this.keyword) === -1) {
+          this.history.push({
+            keyword:this.keyword,
+            type:this.current?'cn':'jp'
+          })
+        }
+				
+        window.localStorage.setItem("history",JSON.stringify(this.history))
+			},
+			viewhistory(item) {
+				const url = item.type==='cn'?'https://kotobank.jp/jazhword/':'https://kotobank.jp/zhjaword/'
+				this.result = url + item.keyword
+				this.showResult = true
+			},
+      clearHistory() {
+        this.history = []
+        window.localStorage.setItem("history","")
+      },
+      handleSwitchClick() {
+        this.current=!this.current
+      }
+    },
+    mounted() {
+      if (window.localStorage.getItem("history")) {
+        const his = JSON.parse(window.localStorage.getItem("history"))
+        this.history = his
+      }
+    },
+    beforeCreate() {
+    }
+
+  }
+  const app = Vue.createApp(myapp).mount("#app");
+</script>
