@@ -113,10 +113,10 @@ $(function(){
 		if(result === 0){
 			$show_result_btn.html('再试一次');
 		}else if(result == -1){
-			alert('勇敢地去做吧！！！');
+			alert('勇敢地去做吧！！');
 			reset();
 		}else{
-			alert("不要去做！！！")
+			alert("不要做！放弃吧！")
 			reset();
 		}
 	});
