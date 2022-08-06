@@ -116,7 +116,7 @@ $(function(){
 			alert('勇敢地去做吧！！');
 			reset();
 		}else{
-			alert("不要做！放弃吧！")
+			alert('不要做！放弃吧！')
 			reset();
 		}
 	});
